@@ -20,4 +20,13 @@ Simple usage:
 The "vmname" parameter accepts the name of a single VM. If special value \* is provided, then all
 VMs in the **target_resource_group** will be affected.
 
+If you want to use a built-in "Virtual Machine Contributor" instead of the more limited, custom role
+definition, then set manage_role_definition to false:
+
+    module "automation" {
+      --- snip ---
+      manage_role_definition = false
+      --- snip ---
+    }
+
 Check [input.tf](input.tf) to see all the available parameters.
