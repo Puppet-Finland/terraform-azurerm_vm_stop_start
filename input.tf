@@ -40,6 +40,12 @@ variable "automation_schedule_vm_stop_name" {
   default = "vm-stop"
 }
 
+variable "manage_role" {
+  type        = bool
+  description = "Whether to create a role in Azure for VM start/stop"
+  default     = true
+}
+
 variable "start_job_frequency" {
   type    = string
   default = "Day"
