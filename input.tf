@@ -40,6 +40,12 @@ variable "automation_schedule_vm_stop_name" {
   default = "vm-stop"
 }
 
+variable "manage_role_definition" {
+  type        = bool
+  description = "Whether to create and use a restricted role defition for VM start/stop jobs"
+  default     = true
+}
+
 variable "start_job_frequency" {
   type    = string
   default = "Day"
