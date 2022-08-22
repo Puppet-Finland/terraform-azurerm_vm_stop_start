@@ -28,6 +28,7 @@ data "azurerm_role_definition" "virtual_machine_contributor" {
 }
 
 resource "azurerm_role_assignment" "automation" {
+  count              = var.manage_role_assignment ? 1 : 0
   scope              = data.azurerm_subscription.primary.id
   role_definition_id = var.manage_role_definition ? azurerm_role_definition.stop_start_vm[0].role_definition_resource_id : data.azurerm_role_definition.virtual_machine_contributor.role_definition_id
   principal_id       = azurerm_user_assigned_identity.automation.principal_id

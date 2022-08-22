@@ -26,6 +26,7 @@ definition, then set manage_role_definition to false:
     module "automation" {
       --- snip ---
       manage_role_definition = false
+      manage_role_assignment = false
       --- snip ---
     }
 
