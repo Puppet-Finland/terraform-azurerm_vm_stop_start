@@ -52,6 +52,16 @@ variable "manage_role_definition" {
   default     = true
 }
 
+variable "start" {
+  type    = bool
+  default = true
+}
+
+variable "stop" {
+  type    = bool
+  default = true
+}
+
 variable "start_job_frequency" {
   type    = string
   default = "Day"

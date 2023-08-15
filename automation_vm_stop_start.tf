@@ -37,6 +37,7 @@ resource "azurerm_automation_runbook" "simple_azure_vm_start_stop" {
 }
 
 resource "azurerm_automation_job_schedule" "vm_start" {
+  count                   = var.start == true ? 1 : 0
   resource_group_name     = var.resource_group_name
   automation_account_name = azurerm_automation_account.main.name
   schedule_name           = azurerm_automation_schedule.vm_start.name
@@ -51,6 +52,7 @@ resource "azurerm_automation_job_schedule" "vm_start" {
 }
 
 resource "azurerm_automation_job_schedule" "vm_stop" {
+  count                   = var.stop == true ? 1 : 0
   resource_group_name     = var.resource_group_name
   automation_account_name = azurerm_automation_account.main.name
   schedule_name           = azurerm_automation_schedule.vm_stop.name
