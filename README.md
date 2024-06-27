@@ -13,6 +13,7 @@ Simple usage:
       automation_account_name     = "development"
       resource_group_location     = azurerm_resource_group.main.location
       resource_group_name         = azurerm_resource_group.main.name
+      subscription_id             = data.azurerm_subscription.current.id
       target_resource_group_name  = "development-rg"
       vmname                      = "testvm"
     }
