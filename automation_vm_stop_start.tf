@@ -44,10 +44,11 @@ resource "azurerm_automation_job_schedule" "vm_start" {
   runbook_name            = azurerm_automation_runbook.simple_azure_vm_start_stop.name
 
   parameters = {
-    resourcegroupname = var.target_resource_group_name
-    vmname              = var.vmname
-    azuresubscriptionid = var.subscription_id
-    action              = "start"
+    resourcegroupname            = var.target_resource_group_name
+    userassignedidentityclientid = var.user_assigned_identity_client_id
+    vmname                       = var.vmname
+    azuresubscriptionid          = var.subscription_id
+    action                       = "start"
   }
 }
 
@@ -59,9 +60,10 @@ resource "azurerm_automation_job_schedule" "vm_stop" {
   runbook_name            = azurerm_automation_runbook.simple_azure_vm_start_stop.name
 
   parameters = {
-    resourcegroupname   = var.target_resource_group_name
-    azuresubscriptionid = var.subscription_id
-    vmname              = var.vmname
-    action              = "stop"
+    resourcegroupname            = var.target_resource_group_name
+    userassignedidentityclientid = var.user_assigned_identity_client_id
+    azuresubscriptionid          = var.subscription_id
+    vmname                       = var.vmname
+    action                       = "stop"
   }
 }

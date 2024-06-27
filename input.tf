@@ -96,6 +96,10 @@ variable "subscription_id" {
   type = string
 }
 
+variable "user_assigned_identity_client_id" {
+  type    = string
+}
+
 variable "user_assigned_identity_name" {
   type    = string
   default = "automation"
