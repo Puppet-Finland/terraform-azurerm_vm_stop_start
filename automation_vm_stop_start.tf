@@ -45,7 +45,7 @@ resource "azurerm_automation_job_schedule" "vm_start" {
 
   parameters = {
     resourcegroupname            = var.target_resource_group_name
-    userassignedidentityclientid = var.user_assigned_identity_client_id
+    userassignedidentityclientid = azurerm_user_assigned_identity.automation.client_id
     vmname                       = var.vmname
     azuresubscriptionid          = var.subscription_id
     action                       = "start"
@@ -61,7 +61,7 @@ resource "azurerm_automation_job_schedule" "vm_stop" {
 
   parameters = {
     resourcegroupname            = var.target_resource_group_name
-    userassignedidentityclientid = var.user_assigned_identity_client_id
+    userassignedidentityclientid = azurerm_user_assigned_identity.automation.client_id
     azuresubscriptionid          = var.subscription_id
     vmname                       = var.vmname
     action                       = "stop"

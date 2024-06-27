@@ -16,7 +16,6 @@ Simple usage:
       source                           = "github.com/Puppet-Finland/terraform-azurerm_vm_stop_start"
       automation_account_name          = "development"
       user_assigned_identity_name      = "my-managed-identity"
-      user_assigned_identity_client_id = <client-id-of-my-managed-identity>
       resource_group_location          = azurerm_resource_group.main.location
       resource_group_name              = azurerm_resource_group.main.name
       subscription_id                  = data.azurerm_subscription.current.id
