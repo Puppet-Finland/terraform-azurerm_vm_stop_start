@@ -92,6 +92,14 @@ variable "stop_job_start_time" {
   default = "2022-08-12T04:30:00+00:00"
 }
 
+variable "subscription_id" {
+  type = string
+}
+
+variable "user_assigned_identity_client_id" {
+  type    = string
+}
+
 variable "user_assigned_identity_name" {
   type    = string
   default = "automation"

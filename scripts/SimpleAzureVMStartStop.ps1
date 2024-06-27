@@ -4,6 +4,7 @@
 .DESCRIPTION
  This script is intended to start or stop Azure Virtual Machines in a simple way in Azure Automation.
  The script uses Azure Automation Managed Identity and the modern ("Az") Azure PowerShell Module.
+ Both system-assigned and user-assigned Managed Identites are supported.
     
  Requirements:
  Give the Azure Automation Managed Identity necessary rights to Start/Stop VMs in the Resource Group.
@@ -13,14 +14,15 @@
    - Microsoft.Compute/virtualMachines/read
 
 .NOTES
-  Version:        1.2.0
+  Version:        1.3.0
   Author:         Andreas Dieckmann
-  Creation Date:  2022-03-11
+  Creation Date:  2023-09-21
+  Last update:    2024-03-20
   GitHub:         https://github.com/diecknet/Simple-Azure-VM-Start-Stop
   Blog:           https://diecknet.de
   License:        MIT License
 
-  Copyright (c) 2022 Andreas Dieckmann
+  Copyright (c) 2024 Andreas Dieckmann and other contributors
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -51,41 +53,68 @@
 .OUTPUTS
     String to determine result of the script
 
+.PARAMETER UserAssignedIdentityClientId
+Specify the Managed Identity Client ID if applicable.
+
+.PARAMETER VMName
+Specify the name of the Virtual Machine, or use the asterisk symbol "*" to affect all VMs in the resource group.
+
+.PARAMETER ResourceGroupName
+Specifies the name of the resource group containing the VM(s).
+
+.PARAMETER AzureSubscriptionID
+Optionally specify Azure Subscription ID.
+
+.PARAMETER Action
+Specify desired Action, allowed values "Start" or "Stop".
+
 #>
 
+[CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
-    # Specify the name of the Virtual Machine, or use the asterisk symbol "*" to affect all VMs in the resource group
+    [Parameter(Mandatory = $false, HelpMessage = "Specify the Managed Identity Client ID if applicable.")]
+    [string]
+    $UserAssignedIdentityClientId,
+
+    [Parameter(Mandatory = $true, HelpMessage = "Specify the VM name or '*' for all VMs in the resource group.")]
+    [string]
     $VMName,
-    [Parameter(Mandatory = $true)]
+
+    [Parameter(Mandatory = $true, HelpMessage = "Specify the name of the resource group containing the VM(s).")]
+    [string]
     $ResourceGroupName,
-    [Parameter(Mandatory = $true)]
-    $AccountId,
-    [Parameter(Mandatory = $false)]
-    # Optionally specify Azure Subscription ID
+
+    [Parameter(Mandatory = $false, HelpMessage = "Optionally specify the Azure Subscription ID.")]
+    [string]
     $AzureSubscriptionID,
-    [Parameter(Mandatory = $true)]
+
+    [Parameter(Mandatory = $true, HelpMessage = "Specify 'Start' or 'Stop' to control the VM(s).")]
     [ValidateSet("Start", "Stop")]
-    # Specify desired Action, allowed values "Start" or "Stop"
+    [string]
     $Action
 )
 
 Write-Output "Script started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
+# temporarily hide Warning message (see Issue #2 in Github)
+$WarningPreference = "SilentlyContinue"
+# explicitly load the required PowerShell Az modules
+Import-Module Az.Accounts,Az.Compute
+# re-set WarningPreference to show Warning Messages
+$WarningPreference = "Continue"
+
 $errorCount = 0
 
 # connect to Azure, suppress output
 try {
-    # Ensures you do not inherit an AzContext in your runbook
-    Disable-AzContextAutosave -Scope Process
-
-    # Connect to Azure with user-assigned managed identity
-    $AzureContext = (Connect-AzAccount -Identity -AccountId $AccountId).context
-
-    # set and store context
-    $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription -DefaultProfile $AzureContext
-
-    #$null = Connect-AzAccount -Identity
+    if($UserAssignedIdentityClientId) {
+        Write-Output "Trying to connect to Azure with a User assigned Identity, with the Client ID $UserAssignedIdentityClientId..."
+        $null = Connect-AzAccount -Identity -AccountId $UserAssignedIdentityClientId
+    }
+    else {
+        Write-Output "Trying to connect to Azure with a system assigned Identity..."
+        $null = Connect-AzAccount -Identity
+    }
 }
 catch {
     $ErrorMessage = "Error connecting to Azure: " + $_.Exception.message
@@ -127,7 +156,7 @@ if ([string]::IsNullOrEmpty($AzContext.Subscription)) {
 if ($VMName -eq "*") {
     try {
         # if "*" was given as the VMName, get all VMs in the resource group
-        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName
+        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName -ErrorAction Stop
     }
     catch {
         $ErrorMessage = "Error getting VMs from resource group ($ResourceGroupName): " + $_.Exception.message
@@ -141,7 +170,7 @@ if ($VMName -eq "*") {
 else {
     try {
         # get only the specified VM
-        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMName
+        $VMs = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMName -ErrorAction Stop
     }
     catch {
         $ErrorMessage = "Error getting VM ($VMName) from resource group ($ResourceGroupName): " + $_.Exception.message

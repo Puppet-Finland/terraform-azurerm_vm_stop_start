@@ -6,15 +6,22 @@ available in [this blog post](https://www.puppeteers.net/blog/modern-cronjob-par
 
 # Usage
 
+This script uses
+[Simple-Azure-VM-Start-Stop](https://github.com/diecknet/Simple-Azure-VM-Start-Stop)
+Powershell script under the hood.
+
 Simple usage:
 
     module "automation" {
-      source                      = "github.com/Puppet-Finland/terraform-azurerm_vm_stop_start"
-      automation_account_name     = "development"
-      resource_group_location     = azurerm_resource_group.main.location
-      resource_group_name         = azurerm_resource_group.main.name
-      target_resource_group_name  = "development-rg"
-      vmname                      = "testvm"
+      source                           = "github.com/Puppet-Finland/terraform-azurerm_vm_stop_start"
+      automation_account_name          = "development"
+      user_assigned_identity_name      = "my-managed-identity"
+      user_assigned_identity_client_id = <client-id-of-my-managed-identity>
+      resource_group_location          = azurerm_resource_group.main.location
+      resource_group_name              = azurerm_resource_group.main.name
+      subscription_id                  = data.azurerm_subscription.current.id
+      target_resource_group_name       = "development-rg"
+      vmname                           = "testvm"
     }
 
 The "vmname" parameter accepts the name of a single VM. If special value \* is provided, then all
